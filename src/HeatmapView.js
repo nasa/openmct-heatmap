@@ -1,15 +1,9 @@
 define([
-    './HeatmapColors',
     './HeatmapController',
-    './HeatmapModel',
-    './HeatmapRenderer',
     'text!./heatmap.html',
     'vue'
 ], function (
-    HeatmapColors,
     HeatmapController,
-    HeatmapModel,
-    HeatmapRenderer,
     heatmapTemplate,
     Vue
 ) {
@@ -37,21 +31,15 @@ define([
             data: data,
             mounted: function () {
                 this.$nextTick(function () {
-                    var canvas = vue.$refs.heatmap_grid;
-                    var legend = vue.$refs.heatmap_legend;
-                    var colors = new HeatmapColors(+self.domainObject.low, +self.domainObject.high);
-                    var renderer = new HeatmapRenderer(canvas, legend, colors);
-                    var model = new HeatmapModel(self.domainObject.gridSize);
-
                     self.controller = new HeatmapController(
                         data,
-                        model,
-                        renderer,
+                        vue.$refs.heatmap_grid,
+                        vue.$refs.heatmap_legend,
                         self.domainObject,
                         self.openmct
                     );
-
-                    canvas.width = canvas.height = 1000; // Todo: change this to use .innerHeight/width of container
+                    // TODO: Resize dynamically to actual element size?
+                    vue.$refs.heatmap_grid.width = vue.$refs.heatmap_grid.height = 1000;
                 });
             }
         });
