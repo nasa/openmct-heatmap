@@ -1,8 +1,17 @@
-define([], function () {
-    function HeatmapController(data, heatmapModel, heatmapRenderer, domainObject, openmct) {
+define([
+    './HeatmapColors',
+    './HeatmapModel',
+    './HeatmapRenderer'
+], function (
+    HeatmapColors,
+    HeatmapModel,
+    HeatmapRenderer
+) {
+    function HeatmapController(data, canvas, legend, domainObject, openmct) {
+        this.colors = new HeatmapColors(+domainObject.low, +domainObject.high);
+        this.heatmapRenderer = new HeatmapRenderer(canvas, legend, this.colors);
+
         this.data = data;
-        this.heatmapModel = heatmapModel;
-        this.heatmapRenderer = heatmapRenderer;
         this.openmct = openmct;
         this.latest = {};
         this.queue = [];
@@ -17,6 +26,12 @@ define([], function () {
         this.openmct.time.on('bounds', this.bounds);
         this.openmct.time.on('timeSystem', this.refresh);
 
+        this.stopObserving =
+            this.openmct.objects.observe(domainObject, '*', function (newObject) {
+                this.domainObject = newObject;
+                this.refresh();
+            }.bind(this));
+
         this.refresh();
     }
 
@@ -30,7 +45,9 @@ define([], function () {
         var domainObject = this.domainObject;
         var requests = [];
 
-        this.heatmapModel.clear();
+        this.colors.extents(+domainObject.low, +domainObject.high);
+        this.heatmapModel = new HeatmapModel(domainObject.gridSize);
+
         this.unsubscribes.forEach(function (unsubscribe) {
             unsubscribe();
         });
@@ -53,6 +70,8 @@ define([], function () {
                 );
             }.bind(this)));
         }.bind(this));
+
+        this.updateView();
 
         Promise.all(requests).then(this.handleResponses.bind(this));
     };
@@ -149,7 +168,6 @@ define([], function () {
         var max = +this.domainObject.high;
         var sz = Math.max(bounds.width, bounds.height) + 3;
 
-
         while (xTicks.length < sz) {
             xTicks.push(x * bounds.size);
             x += 1;
@@ -168,6 +186,7 @@ define([], function () {
     HeatmapController.prototype.destroy = function () {
         this.openmct.time.off('bounds', this.refresh);
         this.openmct.time.off('timeSystem', this.refresh);
+        this.stopObserving();
         this.unsubscribes.forEach(function (unsubscribe) {
             unsubscribe();
         });

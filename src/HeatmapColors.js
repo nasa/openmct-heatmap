@@ -4,6 +4,16 @@ define([], function () {
         this.maximum = maximum;
     }
 
+    HeatmapColors.prototype.extents = function (minimum, maximum) {
+        if (typeof minimum !== 'undefined') {
+            this.minimum = minimum;
+        }
+        if (typeof maximum !== 'undefined') {
+            this.maximum = maximum;
+        }
+        return { maximum: this.maximum, minimum: this.minimum };
+    };
+
     HeatmapColors.prototype.color = function (value) {
         if (value === undefined) {
             return "rgb(33,33,33)";
