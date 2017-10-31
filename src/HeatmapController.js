@@ -17,6 +17,9 @@ define([], function () {
         this.openmct.time.on('bounds', this.bounds);
         this.openmct.time.on('timeSystem', this.refresh);
 
+        this.stopObserving =
+            this.openmct.objects.observe(domainObject, '*', this.refresh);
+
         this.refresh();
     }
 
@@ -168,6 +171,7 @@ define([], function () {
     HeatmapController.prototype.destroy = function () {
         this.openmct.time.off('bounds', this.refresh);
         this.openmct.time.off('timeSystem', this.refresh);
+        this.stopObserving();
         this.unsubscribes.forEach(function (unsubscribe) {
             unsubscribe();
         });
