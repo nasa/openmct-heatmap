@@ -37,6 +37,14 @@ module.exports = {
                         loader: "html-loader"
                     }
                 ]
+            },
+            {
+                test: /\.vue/,
+                use: [
+                    {
+                        loader: "vue-loader"
+                    }
+                ]
             }
         ]
     }
