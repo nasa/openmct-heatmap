@@ -1,8 +1,7 @@
 define([], function () {
-    function HeatmapController(data, heatmapModel, heatmapRenderer, domainObject, openmct) {
+    function HeatmapController(data, heatmapModel, domainObject, openmct) {
         this.data = data;
         this.heatmapModel = heatmapModel;
-        this.heatmapRenderer = heatmapRenderer;
         this.openmct = openmct;
         this.latest = {};
         this.queue = [];
@@ -133,7 +132,7 @@ define([], function () {
             window.requestAnimationFrame(function () {
                 this.renderScheduled = false;
                 this.updateView();
-                this.heatmapRenderer.render(this.heatmapModel);
+                this.data.render(this.heatmapModel);
             }.bind(this));
         }
     };
